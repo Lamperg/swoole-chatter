@@ -1,0 +1,48 @@
+version: "3.4"
+services:
+
+  # PHP-FPM
+  #=============================================================================
+  app:
+    build:
+      context: ./docker
+      dockerfile: app/Dockerfile
+      args:
+        - APP_PHP_VERSION=${PHP_VERSION}
+        - APP_SYS_USER_ID=${SYS_USER_ID}
+        - APP_SYS_GROUP_ID=${SYS_GROUP_ID}
+      target: dev
+    container_name: swoole-chatter-app
+    networks:
+      - app-network
+    volumes:
+      - ./src:/var/www/github-actions-training
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+
+  # DATABASE
+  #=============================================================================
+  db:
+    image: mysql:5.7.22
+    container_name: swoole-chatter-db
+    restart: always
+    environment:
+      MYSQL_USER: ${DB_USER}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+# DOCKER NETWORKS
+#===============================================================================
+networks:
+  app-network:
+    driver: bridge
+
+# DOCKER VOLUMES
+#===============================================================================
+volumes:
+  db-data:
+    driver: local

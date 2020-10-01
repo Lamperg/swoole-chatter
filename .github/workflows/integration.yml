@@ -1,0 +1,67 @@
+name: Integration
+
+# Trigger events
+#=============================================================================
+on:
+#  pull_request:
+#    branches:
+#      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Environment variables
+    #==========================================================================
+    env:
+      DB_NAME: test
+      DB_USER: test
+      DB_PASSWORD: test
+
+      PHP_VERSION: 7.4
+      SYS_USER_ID: ${{ secrets.SYS_USER_ID }}
+      SYS_GROUP_ID: ${{ secrets.SYS_GROUP_ID }}
+
+    # Steps of the pipeline
+    #==========================================================================
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Environment info
+        run: docker-compose --version
+
+      - name: Validate docker config
+        run: |
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml config
+
+      - name: Build docker
+        if: success()
+        run: |
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+      - name: Validate composer config
+        if: success()
+        run: docker-compose exec -T --user www app composer validate
+
+      - name: Install dependencies
+        if: success()
+        run: |
+          docker-compose exec -T --user www app \
+          composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Check code quality
+        if: success()
+        run: |
+          docker-compose exec -T --user www app \
+          ./vendor/bin/phpcs
+
+      - name: Run static analysis
+        if: success()
+        run: |
+          docker-compose exec -T --user www app \
+          ./vendor/bin/psalm --show-info=false
+
+      - name: Run PHP tests
+        run: |
+          docker-compose exec -T --user www app \
+          ./vendor/bin/phpunit --testdox

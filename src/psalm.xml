@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<psalm
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        totallyTyped="false"
+        xmlns="https://getpsalm.org/schema/config"
+        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="app"/>
+        <directory name="tests"/>
+    </projectFiles>
+
+    <issueHandlers>
+        <MissingPropertyType errorLevel="suppress"/>
+        <PossiblyInvalidMethodCall errorLevel="suppress"/>
+        <ArgumentTypeCoercion errorLevel="suppress"/>
+        <LessSpecificReturnStatement errorLevel="suppress"/>
+        <MoreSpecificReturnType errorLevel="suppress"/>
+        <InvalidStringClass errorLevel="suppress"/>
+        <MoreSpecificImplementedParamType errorLevel="suppress"/>
+        <InvalidNullableReturnType errorLevel="suppress"/>
+        <NullableReturnStatement errorLevel="suppress"/>
+        <PossiblyInvalidArgument errorLevel="suppress"/>
+        <MissingClosureReturnType errorLevel="suppress"/>
+        <DeprecatedMethod errorLevel="info"/>
+        <MissingParamType errorLevel="info"/>
+        <MissingClosureParamType errorLevel="info"/>
+        <MissingReturnType errorLevel="info"/>
+        <DeprecatedClass errorLevel="info"/>
+        <PossiblyNullReference errorLevel="info"/>
+        <PossiblyNullArgument errorLevel="info"/>
+        <PossiblyNullOperand errorLevel="info"/>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <directory name="tests"/>
+            </errorLevel>
+        </UndefinedClass>
+        <PossiblyUndefinedMethod>
+            <errorLevel type="suppress">
+                <directory name="tests"/>
+            </errorLevel>
+        </PossiblyUndefinedMethod>
+        <PropertyNotSetInConstructor>
+            <errorLevel type="suppress">
+                <directory name="tests"/>
+            </errorLevel>
+        </PropertyNotSetInConstructor>
+        <InternalMethod>
+            <errorLevel type="suppress">
+                <directory name="tests"/>
+            </errorLevel>
+        </InternalMethod>
+    </issueHandlers>
+</psalm>

@@ -1,0 +1,27 @@
+name: Deployment
+
+# Trigger events
+#=============================================================================
+on:
+#  push:
+#    branches:
+#      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Steps of the pipeline
+    #==========================================================================
+    steps:
+      - uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOYMENT_HOST }}
+          username: ${{ secrets.DEPLOYMENT_USER }}
+          password: ${{ secrets.DEPLOYMENT_PASSWORD }}
+          port: ${{ secrets.DEPLOYMENT_PORT }}
+          script: |
+            cd ${{ secrets.DEPLOYMENT_PROJECT_PATH }}
+            git pull origin master
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+            docker-compose exec -T --user www app composer install --prefer-dist --no-dev --optimize-autoloader --no-interaction
