@@ -2,9 +2,9 @@
 
 require_once 'vendor/autoload.php';
 
-$server = new swoole_http_server("app", 9000, SWOOLE_BASE);
+$server = new Swoole\Http\Server("app", 9000, SWOOLE_BASE);
 
-$server->on("request", function ($request, $response) {
+$server->on("request", function (Swoole\Http\Request $request, Swoole\HTTP\Response $response) {
     $app = App\RunnerFactory::create();
     $app->run();
 

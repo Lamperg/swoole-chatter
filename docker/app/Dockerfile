@@ -6,6 +6,7 @@ FROM php:${APP_PHP_VERSION}-fpm as base
 
 ARG APP_SYS_USER_ID
 ARG APP_SYS_GROUP_ID
+ARG APP_NODE_JS_VERSION
 
 # Set working directory
 WORKDIR /var/www/swoole-chatter
@@ -24,6 +25,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Install Swoole
 RUN pecl install swoole
+
+# Install nodejs/npm
+RUN curl -sL https://deb.nodesource.com/setup_${APP_NODE_JS_VERSION}.x | bash -
+RUN apt-get -y install nodejs
 
 # Add user for application
 RUN groupadd -g ${APP_SYS_GROUP_ID} www
