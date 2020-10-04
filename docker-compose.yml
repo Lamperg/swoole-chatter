@@ -11,13 +11,29 @@ services:
         - APP_PHP_VERSION=${PHP_VERSION}
         - APP_SYS_USER_ID=${SYS_USER_ID}
         - APP_SYS_GROUP_ID=${SYS_GROUP_ID}
-      target: dev
     container_name: swoole-chatter-app
     networks:
       - app-network
     volumes:
-      - ./src:/var/www/github-actions-training
+      - ./src:/var/www/swoole-chatter
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+
+  # NGINX Server
+  #=============================================================================
+  webserver:
+    image: nginx:alpine
+    container_name: swoole-chatter-webserver
+    restart: always
+    links:
+      - app
+    depends_on:
+      - app
+    networks:
+      - app-network
+    working_dir: /var/www/swoole-chatter
+    volumes:
+      - ./src/public:/var/www/swoole-chatter
+      - ./docker/nginx/app.conf:/etc/nginx/conf.d/app.conf
 
   # DATABASE
   #=============================================================================

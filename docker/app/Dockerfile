@@ -8,16 +8,16 @@ ARG APP_SYS_USER_ID
 ARG APP_SYS_GROUP_ID
 
 # Set working directory
-WORKDIR /var/www/github-actions-training
+WORKDIR /var/www/swoole-chatter
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     zip \
-    unzip \
-    # Cleanup app-list to reduce size of the image
-     && apt-get clean \
-     && rm -rf /var/lib/apt/lists/*
+    unzip
+
+# Cleanup app-list to reduce size of the image
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -30,12 +30,12 @@ RUN groupadd -g ${APP_SYS_GROUP_ID} www
 RUN useradd -u ${APP_SYS_USER_ID} -ms /bin/bash -g www www
 
 # Change application directory permissions
-RUN chown -R www:www /var/www/github-actions-training
+RUN chown -R www:www /var/www/swoole-chatter
 
 # Change current user to www
 USER www
 
 # Expose public ports and start swoole server
-EXPOSE 80 9000
+EXPOSE 9000
 
 CMD ["php", "index.php"]
