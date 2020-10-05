@@ -1,4 +1,9 @@
 .env
 .idea
 src/vendor/
+src/node_modules/
 src/.phpunit.result.cache
+src/mix-manifest.json
+
+src/public/*
+!src/public/index.html
