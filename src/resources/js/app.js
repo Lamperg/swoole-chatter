@@ -6,6 +6,8 @@ socket.onopen = function() {
     socket.send('Hello server!');
 };
 
+socket.onerror = ev => console.log('error happen', ev);
+
 socket.onmessage = function(event) {
   console.log("message received:", event.data);
 };
