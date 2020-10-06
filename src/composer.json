@@ -11,7 +11,8 @@
     "require": {
         "php": ">=7.4",
         "ext-json": "*",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "nikic/fast-route": "^1.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.3",
