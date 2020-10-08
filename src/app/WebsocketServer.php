@@ -4,20 +4,17 @@ namespace App;
 
 use Swoole\Http\Request;
 use Swoole\Http\Response;
-use Swoole\Table;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 
 class WebsocketServer
 {
     protected Server $server;
-    protected Table $messages;
-    protected Table $connections;
+    protected DataSource $dataSource;
 
-    public function __construct(Router $router)
+    public function __construct(Router $router, DataSource $dataSource)
     {
-        $this->createTables();
-
+        $this->dataSource = $dataSource;
         $this->server = new Server("app", 9000);
 
         $this->server->on('open', function (Server $server, Request $request): void {
@@ -65,10 +62,10 @@ class WebsocketServer
     {
         echo "connection open: {$request->fd}\n";
         // store the client on our memory table
-        $this->connections->set($request->fd, ['client' => $request->fd]);
+        $this->dataSource->getConnections()->set($request->fd, ['client' => $request->fd]);
 
         // update all the client with the existing messages
-        foreach ($this->messages as $row) {
+        foreach ($this->dataSource->getMessages() as $row) {
             $this->server->push($request->fd, json_encode($row));
         }
     }
@@ -85,10 +82,10 @@ class WebsocketServer
         $output['client'] = $frame->fd;
 
         // now we can store the message in the Table
-        $this->messages->set($output['username'] . time(), $output);
+        $this->dataSource->getMessages()->set($output['username'] . time(), $output);
 
         // now we notify any of the connected clients
-        foreach ($this->connections as $client) {
+        foreach ($this->dataSource->getConnections() as $client) {
             $this->server->push($client['client'], json_encode($output));
         }
     }
@@ -97,22 +94,6 @@ class WebsocketServer
     {
         echo "client {$client} closed\n";
         // remove the client from the memory table
-        $this->connections->del($client);
-    }
-
-    protected function createTables()
-    {
-        // Table is a shared memory table that can be used across connections
-        $this->messages = new Table(1024);
-        // we need to set the types that the table columns support - just like a RDB
-        $this->messages->column('id', Table::TYPE_INT, 11);
-        $this->messages->column('client', Table::TYPE_INT, 4);
-        $this->messages->column('username', Table::TYPE_STRING, 64);
-        $this->messages->column('message', Table::TYPE_STRING, 255);
-        $this->messages->create();
-
-        $this->connections = new Table(1024);
-        $this->connections->column('client', Table::TYPE_INT, 4);
-        $this->connections->create();
+        $this->dataSource->getConnections()->del($client);
     }
 }
