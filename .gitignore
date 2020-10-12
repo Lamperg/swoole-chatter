@@ -1,5 +1,6 @@
 .env
 .idea
+.ignore
 src/vendor/
 src/node_modules/
 src/.phpunit.result.cache
