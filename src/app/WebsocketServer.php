@@ -2,10 +2,12 @@
 
 namespace App;
 
+use RuntimeException;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
+use App\Kernel\DatabaseConnectionPool;
 
 class WebsocketServer
 {
@@ -54,6 +56,31 @@ class WebsocketServer
             // write the JSON string out
             $response->end(json_encode($result));
         });
+
+        $this->server->on('workerStart', function (Server $server, int $workerId) {
+            echo "worker $workerId: has been started" . PHP_EOL;
+
+            $dbPool = new DatabaseConnectionPool();
+            $connection = $dbPool->getConnection();
+            $statement = $connection->prepare('select * from test');
+            if (!$statement) {
+                throw new RuntimeException('Prepare failed');
+            }
+            $result = $statement->execute();
+            if (!$result) {
+                throw new RuntimeException('Execute failed');
+            }
+            $result = $statement->fetchAll();
+            $dbPool->putConnection($connection);
+
+            print_r($result);
+        });
+
+        $this->server->set([
+//            "worker_num" => swoole_cpu_num() * 2
+            "worker_num" => 2
+        ]);
+
 
         $this->server->start();
     }
