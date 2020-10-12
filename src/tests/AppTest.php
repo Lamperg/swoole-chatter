@@ -2,8 +2,8 @@
 
 namespace Tests;
 
-use App\Runner;
-use App\RunnerFactory;
+use App\Application;
+use App\Kernel\WebsocketServer;
 use PHPUnit\Framework\TestCase;
 
 class AppTest extends TestCase
@@ -11,9 +11,11 @@ class AppTest extends TestCase
     /**
      * @test
      */
-    public function example()
+    public function serverCanBeBooted()
     {
-        $app = RunnerFactory::create();
-        $this->assertInstanceOf(Runner::class, $app);
+        $server = Application::getServer();
+        
+        $this->assertNotEmpty($server);
+        $this->assertInstanceOf(WebsocketServer::class, $server);
     }
 }

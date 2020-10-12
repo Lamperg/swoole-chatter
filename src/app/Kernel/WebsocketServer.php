@@ -1,16 +1,23 @@
 <?php
 
-namespace App;
+namespace App\Kernel;
 
+use App\Router;
+use App\DataSource;
 use RuntimeException;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
-use App\Kernel\DatabaseConnectionPool;
 
 class WebsocketServer
 {
+    const REQUEST = 'request';
+    const MESSAGE = 'message';
+    const CONNECTION_OPEN = 'open';
+    const CONNECTION_CLOSE = 'close';
+    const WORKER_START = 'workerStart';
+
     protected Server $server;
     protected DataSource $dataSource;
 
@@ -61,6 +68,7 @@ class WebsocketServer
             echo "worker $workerId: has been started" . PHP_EOL;
 
             $dbPool = new DatabaseConnectionPool();
+            // get available db connection
             $connection = $dbPool->getConnection();
             $statement = $connection->prepare('select * from test');
             if (!$statement) {
@@ -71,6 +79,7 @@ class WebsocketServer
                 throw new RuntimeException('Execute failed');
             }
             $result = $statement->fetchAll();
+            // move the connection back to pool
             $dbPool->putConnection($connection);
 
             print_r($result);
@@ -80,7 +89,6 @@ class WebsocketServer
 //            "worker_num" => swoole_cpu_num() * 2
             "worker_num" => 2
         ]);
-
 
         $this->server->start();
     }

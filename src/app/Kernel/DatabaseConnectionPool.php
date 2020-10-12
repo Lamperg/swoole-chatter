@@ -2,6 +2,7 @@
 
 namespace App\Kernel;
 
+use PDO;
 use Swoole\Database\PDOPool;
 use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOProxy;
@@ -25,7 +26,7 @@ class DatabaseConnectionPool
     /**
      * Gets an available db connection from the pool.
      *
-     * @return \PDO|PDOProxy
+     * @return PDO|PDOProxy
      */
     public function getConnection()
     {
