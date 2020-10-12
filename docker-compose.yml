@@ -19,7 +19,6 @@ services:
       - app-network
     volumes:
       - ./src:/var/www/swoole-chatter
-#      - ./.env:/var/www/swoole-chatter/.env
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
 
   # NGINX Server
@@ -27,7 +26,7 @@ services:
   webserver:
     image: nginx:alpine
     container_name: swoole-chatter-webserver
-    restart: always
+    restart: unless-stopped
     links:
       - app
     depends_on:
@@ -44,7 +43,7 @@ services:
   db:
     image: mysql:5.7.22
     container_name: swoole-chatter-db
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_USER: ${DB_USER}
       MYSQL_DATABASE: ${DB_NAME}
