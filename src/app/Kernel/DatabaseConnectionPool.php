@@ -36,9 +36,9 @@ class DatabaseConnectionPool
     /**
      * Puts used db connection back to the pool.
      *
-     * @param PDOProxy $connection
+     * @param $connection
      */
-    public function putConnection(PDOProxy $connection): void
+    public function putConnection($connection): void
     {
         $this->pool->put($connection);
     }
