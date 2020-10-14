@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Kernel\DatabaseConnectionPool;
 use Swoole\Table;
 
 class MessageRepository
@@ -13,9 +14,48 @@ class MessageRepository
      */
     protected Table $messages;
 
+    protected DatabaseConnectionPool $dbPool;
+
     public function __construct()
     {
+        $this->dbPool = new DatabaseConnectionPool();
+
         $this->createTable();
+    }
+
+    public function getAll(): array
+    {
+        // get available db connection
+        $connection = $this->dbPool->getConnection();
+
+        $statement = $connection->prepare('select * from messages');
+        if (!$statement) {
+            throw new \RuntimeException('Prepare failed');
+        }
+        $result = $statement->execute();
+        if (!$result) {
+            throw new \RuntimeException('Execute failed');
+        }
+
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        // move the connection back to pool
+        $this->dbPool->putConnection($connection);
+
+        return $result;
+    }
+
+    public function add(string $client, string $username, string $message)
+    {
+        // get available db connection
+        $connection = $this->dbPool->getConnection();
+
+        $sql = "INSERT INTO messages (client, username, text) VALUES (?,?,?)";
+        $stmt = $connection->prepare($sql);
+        $stmt->execute([$client, $username, $message]);
+
+        // move the connection back to pool
+        $this->dbPool->putConnection($connection);
     }
 
     public function getMessages(): Table

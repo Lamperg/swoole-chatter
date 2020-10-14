@@ -38,28 +38,11 @@ class WebsocketServer
             echo "worker $workerId: has been started" . PHP_EOL;
 
             $this->messageRepositories[$workerId] = new MessageRepository();
-
-//            $this->messageRepository = new MessageRepository();
-
-//            $dbPool = new DatabaseConnectionPool();
-//            // get available db connection
-//            $connection = $dbPool->getConnection();
-//            $statement = $connection->prepare('select * from test');
-//            if (!$statement) {
-//                throw new RuntimeException('Prepare failed');
-//            }
-//            $result = $statement->execute();
-//            if (!$result) {
-//                throw new RuntimeException('Execute failed');
-//            }
-//            $result = $statement->fetchAll();
-//            // move the connection back to pool
-//            $dbPool->putConnection($connection);
-//
-//            print_r($result);
         });
 
         $this->server->on('workerstop', function (Server $server, int $workerId) {
+            echo "worker $workerId: has been stopped" . PHP_EOL;
+
             if (isset($this->messageRepositories[$workerId])) {
                 unset($this->messageRepositories[$workerId]);
             }
@@ -74,8 +57,8 @@ class WebsocketServer
             $this->userRepository->getUsers()->set($request->fd, ['user' => $request->fd]);
 
 //            // update all the client with the existing messages
-            foreach ($messageRepository->getMessages() as $row) {
-                $this->server->push($request->fd, json_encode($row));
+            foreach ($messageRepository->getAll() as $message) {
+                $this->server->push($request->fd, json_encode($message));
             }
         });
 
@@ -87,16 +70,21 @@ class WebsocketServer
             // frame data comes in as a string
             $output = json_decode($frame->data, true);
 
-            // assign a "unique" id for this message
-            $output['id'] = time();
-            $output['client'] = $frame->fd;
+            $client = $frame->fd;
+            $message = $output['message'] ?? "";
+            $username = $output['username'] ?? "";
 
-            // now we can store the message in the Table
-            $messageRepository->getMessages()->set($output['username'] . time(), $output);
+            $messageRepository->add($client, $username, $message);
 
             // now we notify any of the connected clients
             foreach ($this->userRepository->getUsers() as $client) {
-                $this->server->push($client['user'], json_encode($output));
+                $message = [
+                    "text" => $message,
+                    "client" => $client,
+                    "username" => $username
+                ];
+
+                $this->server->push($client['user'], json_encode($message));
             }
         });
 
