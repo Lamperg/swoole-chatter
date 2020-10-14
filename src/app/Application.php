@@ -2,6 +2,9 @@
 
 namespace App;
 
+use App\Handlers\ConnectionCloseHandler;
+use App\Handlers\ConnectionOpenHandler;
+use App\Utilities\Logger;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\WebSocket\Frame;
@@ -14,6 +17,7 @@ class Application
     protected Router $router;
     protected Server $server;
     protected UserRepository $userRepository;
+    protected MessageRepository $messageRepository;
 
     /**
      * Pool of message repositories.
@@ -26,6 +30,7 @@ class Application
     {
         $this->router = new Router();
         $this->userRepository = new UserRepository();
+        $this->messageRepository = new MessageRepository();
         $this->server = new Server("app", getenv('APP_SERVER_PORT'));
 
         $this->setHandlers();
@@ -45,36 +50,19 @@ class Application
     protected function setHandlers()
     {
         $this->server->on('workerStart', function (Server $server, int $workerId) {
-            echo "worker $workerId: has been started" . PHP_EOL;
+            Logger::log("worker $workerId: has been started");
             $this->messageRepositories[$workerId] = new MessageRepository();
         });
 
         $this->server->on('workerStop', function (Server $server, int $workerId) {
-            echo "worker $workerId: has been stopped" . PHP_EOL;
+            Logger::log("worker $workerId: has been stopped");
             if (isset($this->messageRepositories[$workerId])) {
                 unset($this->messageRepositories[$workerId]);
             }
         });
 
-        $this->server->on('open', function (Server $server, Request $request): void {
-            echo "connection open: {$request->fd}; workerId: " . $server->getWorkerId() . PHP_EOL;
-
-            $messageRepository = $this->messageRepositories[$server->getWorkerId()];
-
-            // store the client on our memory table
-            $this->userRepository->getUsers()->set($request->fd, ['user' => $request->fd]);
-
-            // update all the client with the existing messages
-            foreach ($messageRepository->getAll() as $message) {
-                $server->push($request->fd, json_encode($message));
-            }
-        });
-
-        $this->server->on('close', function (Server $server, int $client): void {
-            echo "client {$client} closed" . PHP_EOL;
-            // remove the client from the memory table
-            $this->userRepository->getUsers()->del($client);
-        });
+        $this->server->on('open', new ConnectionOpenHandler($this->userRepository, $this->messageRepository));
+        $this->server->on('close', new ConnectionCloseHandler($this->userRepository));
 
         $this->server->on('message', function (Server $server, Frame $frame): void {
             echo "receive from {$frame->fd}:{$frame->data}" . PHP_EOL;
