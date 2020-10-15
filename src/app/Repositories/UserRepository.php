@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\User;
 use Swoole\Table;
 
 class UserRepository
@@ -23,6 +24,32 @@ class UserRepository
         return $this->users;
     }
 
+    /**
+     * @return User[]
+     */
+    public function getAll(): array
+    {
+        $result = [];
+
+        foreach ($this->users as $connection => $user) {
+            $result[] = new User($user['username'], $connection);
+        }
+
+        return $result;
+    }
+
+    public function add(User $user)
+    {
+        $this->users->set($user->getConnectionId(), [
+            'username' => $user->getUsername()
+        ]);
+    }
+
+    public function remove(int $connectionId)
+    {
+        $this->users->del($connectionId);
+    }
+
     protected function createTable()
     {
         if (isset($this->users)) {
@@ -30,7 +57,7 @@ class UserRepository
         }
 
         $this->users = new Table(1024);
-        $this->users->column('user', Table::TYPE_INT, 4);
+        $this->users->column('username', Table::TYPE_STRING, 64);
         $this->users->create();
     }
 }

@@ -31,15 +31,15 @@ class MessageHandler
 
         $this->messageRepository->add($username, $message);
 
-        // now we notify any of the connected clients
-        foreach ($this->userRepository->getUsers() as $client) {
+        // now we notify all of the connected clients
+        foreach ($this->userRepository->getAll() as $user) {
             $message = [
                 "text" => $message,
                 "client" => $frame->fd,
                 "username" => $username
             ];
 
-            $server->push($client['user'], json_encode($message));
+            $server->push($user->getConnectionId(), json_encode($message));
         }
     }
 }

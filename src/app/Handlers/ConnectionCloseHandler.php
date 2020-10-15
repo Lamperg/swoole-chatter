@@ -15,11 +15,11 @@ class ConnectionCloseHandler
         $this->userRepository = $userRepository;
     }
 
-    public function __invoke(Server $server, int $client): void
+    public function __invoke(Server $server, int $connection): void
     {
         // remove the client from the memory table
-        $this->userRepository->getUsers()->del($client);
+        $this->userRepository->remove($connection);
 
-        Logger::log("connection {$client} has been closed (workerId: {$server->getWorkerId()})");
+        Logger::log("connection {$connection} has been closed (workerId: {$server->getWorkerId()})");
     }
 }
