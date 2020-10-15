@@ -16,12 +16,13 @@ class UserRepository
 
     public function __construct()
     {
-        $this->createTable();
-    }
+        if (isset($this->users)) {
+            $this->users->destroy();
+        }
 
-    public function getUsers(): Table
-    {
-        return $this->users;
+        $this->users = new Table(1024 * 24);
+        $this->users->column('username', Table::TYPE_STRING, 64);
+        $this->users->create();
     }
 
     /**
@@ -48,16 +49,5 @@ class UserRepository
     public function remove(int $connectionId)
     {
         $this->users->del($connectionId);
-    }
-
-    protected function createTable()
-    {
-        if (isset($this->users)) {
-            $this->users->destroy();
-        }
-
-        $this->users = new Table(1024);
-        $this->users->column('username', Table::TYPE_STRING, 64);
-        $this->users->create();
     }
 }
