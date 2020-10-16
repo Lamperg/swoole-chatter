@@ -5,7 +5,6 @@ namespace App;
 use App\Utilities\Logger;
 use Swoole\WebSocket\Server;
 use App\Handlers\MessageHandler;
-use App\Handlers\RequestHandler;
 use App\Repositories\UserRepository;
 use App\Repositories\MessageRepository;
 use App\Handlers\ConnectionOpenHandler;
@@ -47,10 +46,6 @@ class Application
         $this->server->on('message', new MessageHandler(
             $this->userRepository,
             $this->messageRepository
-        ));
-
-        $this->server->on('request', new RequestHandler(
-            new Router()
         ));
 
         $this->server->on('open', new ConnectionOpenHandler(
