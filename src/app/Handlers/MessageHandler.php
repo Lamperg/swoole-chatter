@@ -5,6 +5,7 @@ namespace App\Handlers;
 use App\Models\User;
 use App\Models\Message;
 use App\Utilities\Logger;
+use App\Utilities\Purifier;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 use App\Utilities\Authenticator;
@@ -15,6 +16,7 @@ use App\Repositories\MessageRepository;
 
 class MessageHandler
 {
+    protected Purifier $purifier;
     protected Authenticator $authenticator;
     protected UserRepository $userRepository;
     protected MessageRepository $messageRepository;
@@ -24,6 +26,7 @@ class MessageHandler
         UserRepository $userRepository,
         MessageRepository $messageRepository
     ) {
+        $this->purifier = new Purifier();
         $this->authenticator = $authenticator;
         $this->userRepository = $userRepository;
         $this->messageRepository = $messageRepository;
@@ -32,12 +35,16 @@ class MessageHandler
     public function __invoke(Server $server, Frame $frame): void
     {
         $connectionId = $frame->fd;
+        Logger::log("message has been received: {$frame->data} (connection: $connectionId)");
         $data = json_decode($frame->data, true);
 
         $message = $data['message'] ?? "";
         $username = $data['username'] ?? "";
 
         try {
+            $message = $this->purifier->purify($message);
+            $username = $this->purifier->purify($username);
+
             $user = new User($username, $connectionId);
 
             if (!$this->authenticator->isLoggedIn($user)) {
@@ -55,8 +62,6 @@ class MessageHandler
                     $server->push($user->getConnectionId(), $messagesResponse->getJson());
                 });
             }
-
-            Logger::log("message has been received: {$frame->data} (connection: $connectionId)");
         } catch (\Exception $e) {
             Logger::logError($e->getMessage());
 

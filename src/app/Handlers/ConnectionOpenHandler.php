@@ -5,6 +5,7 @@ namespace App\Handlers;
 use App\Models\User;
 use Swoole\Http\Request;
 use App\Utilities\Logger;
+use App\Utilities\Purifier;
 use Swoole\WebSocket\Server;
 use Swoole\Coroutine\WaitGroup;
 use App\Responses\ErrorResponse;
@@ -16,6 +17,7 @@ use App\Repositories\MessageRepository;
 
 class ConnectionOpenHandler
 {
+    protected Purifier $purifier;
     protected Authenticator $authenticator;
     protected UserRepository $userRepository;
     protected MessageRepository $messageRepository;
@@ -25,6 +27,7 @@ class ConnectionOpenHandler
         UserRepository $userRepository,
         MessageRepository $messageRepository
     ) {
+        $this->purifier = new Purifier();
         $this->authenticator = $authenticator;
         $this->userRepository = $userRepository;
         $this->messageRepository = $messageRepository;
@@ -35,12 +38,14 @@ class ConnectionOpenHandler
         $connectionId = $request->fd;
         Logger::log("connection {$request->fd} has been opened (workerId: {$server->getWorkerId()})");
 
-        $username = $request->get["username"];
+        $username = $request->get["username"] ?? "";
 
         $users = [];
         $messages = [];
 
         try {
+            $username = $this->purifier->purify($username);
+
             if ($this->authenticator->isUsernameUsed($username)) {
                 throw new \InvalidArgumentException("username '$username' has already been used");
             }
