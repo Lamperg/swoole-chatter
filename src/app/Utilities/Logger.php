@@ -19,6 +19,7 @@ class Logger
 
     protected static function renderMessage(string $level, string $message): string
     {
-        return "[$level] $message" . PHP_EOL;
+        $date = new \DateTime();
+        return "[{$date->format('Y-m-d H:i:s')}] [$level] $message" . PHP_EOL;
     }
 }

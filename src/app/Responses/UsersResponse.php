@@ -12,7 +12,7 @@ class UsersResponse extends JsonResponse
     {
         foreach ($collection as $user) {
             if ($user instanceof User) {
-                $this->$user[] = $user->toArray();
+                $this->users[] = $user->toArray();
             }
         }
     }

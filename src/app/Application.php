@@ -2,9 +2,10 @@
 
 namespace App;
 
-use App\Utilities\Logger;
 use Swoole\WebSocket\Server;
 use App\Handlers\MessageHandler;
+use App\Handlers\WorkerStopHandler;
+use App\Handlers\WorkerStartHandler;
 use App\Repositories\UserRepository;
 use App\Repositories\MessageRepository;
 use App\Handlers\ConnectionOpenHandler;
@@ -57,12 +58,8 @@ class Application
             $this->userRepository
         ));
 
-        $this->server->on('workerStart', function (Server $server, int $workerId) {
-            Logger::log("worker $workerId: has been started");
-        });
+        $this->server->on('workerStart', new WorkerStartHandler());
 
-        $this->server->on('workerStop', function (Server $server, int $workerId) {
-            Logger::log("worker $workerId: has been stopped");
-        });
+        $this->server->on('workerStop', new WorkerStopHandler());
     }
 }
