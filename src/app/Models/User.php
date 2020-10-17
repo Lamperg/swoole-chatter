@@ -28,4 +28,12 @@ class User
     {
         return $this->connectionId;
     }
+
+    public function toArray(): array
+    {
+        return [
+            "id" => $this->getConnectionId(),
+            "username" => $this->getUsername()
+        ];
+    }
 }

@@ -2,10 +2,9 @@
 
 namespace App\Repositories;
 
-use App\Models\Message;
 use PDO;
-use RuntimeException;
-use App\Kernel\DatabaseConnectionPool;
+use App\Models\Message;
+use App\Utilities\DatabaseConnectionPool;
 
 class MessageRepository
 {
@@ -16,29 +15,37 @@ class MessageRepository
         $this->dbPool = new DatabaseConnectionPool();
     }
 
+    /**
+     * Retrieves collection of all existed messages.
+     *
+     * @return Message[]
+     */
     public function all(): array
     {
         // get available db connection
         $connection = $this->dbPool->getConnection();
 
-        $statement = $connection->prepare('select * from messages');
-        if (!$statement) {
-            throw new RuntimeException('Prepare failed');
-        }
-        $result = $statement->execute();
-        if (!$result) {
-            throw new RuntimeException('Execute failed');
-        }
-
-        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $connection->query('select * from messages');
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // move the connection back to pool
         $this->dbPool->putConnection($connection);
 
-        return $result;
+        $collection = [];
+        foreach ($result as $item) {
+            $message = new Message($item["username"], $item["text"]);
+            $message->setDate(\DateTime::createFromFormat('Y-m-d H:i:s', $item['date']));
+            $message->setId($item["id"]);
+
+            $collection[] = $message;
+        }
+
+        return $collection;
     }
 
     /**
+     * Saves provided message and returns saved info.
+     *
      * @param Message $message
      * @return Message
      */

@@ -5,6 +5,7 @@ namespace App\Handlers;
 use App\Models\Message;
 use App\Repositories\MessageRepository;
 use App\Repositories\UserRepository;
+use App\Responses\ErrorResponse;
 use App\Utilities\Logger;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
@@ -37,7 +38,7 @@ class MessageHandler
             $this->messageRepository->add($messageModel);
 
             // now we notify all of the connected clients
-            foreach ($this->userRepository->getAll() as $user) {
+            foreach ($this->userRepository->all() as $user) {
                 $message = [
                     "text" => $message,
                     "username" => $username,
@@ -49,7 +50,9 @@ class MessageHandler
             }
         } catch (\Exception $e) {
             Logger::logError($e->getMessage());
-            $server->push($connectionId, $e->getMessage());
+
+            $errorResponse = new ErrorResponse($e->getMessage());
+            $server->push($connectionId, $errorResponse->getJson());
         }
     }
 }

@@ -57,4 +57,14 @@ class Message
     {
         $this->date = $dateTime;
     }
+
+    public function toArray(): array
+    {
+        return [
+            "id" => $this->getId(),
+            "text" => $this->getText(),
+            "username" => $this->getUsername(),
+            "date" => $this->getDate()->format('Y-m-d H:i:s')
+        ];
+    }
 }

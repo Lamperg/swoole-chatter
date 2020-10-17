@@ -34,6 +34,6 @@ class UserTest extends TestCase
         $userRepository->add($user);
         $userRepository->delete($user->getConnectionId());
 
-        $this->assertArrayNotHasKey(1, $userRepository->getAll());
+        $this->assertArrayNotHasKey(1, $userRepository->all());
     }
 }

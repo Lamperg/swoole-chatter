@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Kernel;
+namespace App\Utilities;
 
 use PDO;
 use Swoole\Database\PDOPool;

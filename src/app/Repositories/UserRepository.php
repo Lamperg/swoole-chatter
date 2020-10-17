@@ -40,15 +40,15 @@ class UserRepository
     /**
      * @return User[]
      */
-    public function getAll(): array
+    public function all(): array
     {
-        $result = [];
+        $collection = [];
 
         foreach ($this->users as $connection => $user) {
-            $result[$connection] = new User($user['username'], $connection);
+            $collection[$connection] = new User($user['username'], $connection);
         }
 
-        return $result;
+        return $collection;
     }
 
     public function add(User $user)
