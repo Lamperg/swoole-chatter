@@ -38,11 +38,11 @@ class MessageHandler
         Logger::log("message has been received: {$frame->data} (connection: $connectionId)");
         $data = json_decode($frame->data, true);
 
-        $message = $data['message'] ?? "";
+        $text = $data['message'] ?? "";
         $username = $data['username'] ?? "";
 
         try {
-            $message = $this->purifier->purify($message);
+            $text = $this->purifier->purify($text);
             $username = $this->purifier->purify($username);
 
             $user = new User($username, $connectionId);
@@ -51,22 +51,21 @@ class MessageHandler
                 throw new \Exception("user '$username' is not logged in");
             }
 
-            $messageModel = new Message($username, $message);
-
-            $this->messageRepository->add($messageModel);
-            $messagesResponse = new MessagesResponse([$messageModel]);
+            $message = new Message($username, $text);
+            $this->messageRepository->add($message);
+            $messagesResponse = new MessagesResponse([$message]);
 
             foreach ($this->userRepository->all() as $user) {
                 // push new message to all active clients
                 go(function () use ($server, $user, $messagesResponse) {
-                    $server->push($user->getConnectionId(), $messagesResponse->getJson());
+                    $server->push($user->getConnectionId(), $messagesResponse->render());
                 });
             }
         } catch (\Exception $e) {
             Logger::logError($e->getMessage());
 
             $errorResponse = new ErrorResponse($e->getMessage());
-            $server->push($connectionId, $errorResponse->getJson());
+            $server->push($connectionId, $errorResponse->render());
         }
     }
 }

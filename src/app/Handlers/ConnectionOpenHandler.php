@@ -35,13 +35,11 @@ class ConnectionOpenHandler
 
     public function __invoke(Server $server, Request $request): void
     {
-        $connectionId = $request->fd;
-        Logger::log("connection {$request->fd} has been opened (workerId: {$server->getWorkerId()})");
-
-        $username = $request->get["username"] ?? "";
-
         $users = [];
         $messages = [];
+        $connectionId = $request->fd;
+        $username = $request->get["username"] ?? "";
+        Logger::log("connection $connectionId has been opened (workerId: {$server->getWorkerId()})");
 
         try {
             $username = $this->purifier->purify($username);
@@ -70,21 +68,21 @@ class ConnectionOpenHandler
 
             $messagesResponse = new MessagesResponse($messages);
             // push existed messages to opened connection
-            $server->push($connectionId, $messagesResponse->getJson());
+            $server->push($connectionId, $messagesResponse->render());
 
             $usersResponse = new UsersResponse($users);
 
             foreach ($users as $user) {
                 // push updated online users to all active connections
                 go(function () use ($server, $user, $usersResponse) {
-                    $server->push($user->getConnectionId(), $usersResponse->getJson());
+                    $server->push($user->getConnectionId(), $usersResponse->render());
                 });
             }
         } catch (\Exception $e) {
             Logger::logError($e->getMessage());
 
             $errorResponse = new ErrorResponse($e->getMessage());
-            $server->push($connectionId, $errorResponse->getJson());
+            $server->push($connectionId, $errorResponse->render());
         }
     }
 }

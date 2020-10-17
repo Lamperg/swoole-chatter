@@ -24,7 +24,7 @@ abstract class JsonResponse
      * @return string
      * @throws \JsonException
      */
-    public function getJson(): string
+    public function render(): string
     {
         return json_encode([
             "type" => $this->getType(),

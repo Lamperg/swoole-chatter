@@ -47,7 +47,7 @@ class MessageRepository
     }
 
     /**
-     * Saves provided message and returns saved info.
+     * Saves provided message and returns saved model.
      *
      * @param Message $message
      * @return Message
