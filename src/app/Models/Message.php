@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use DateTime;
+use Exception;
+use App\Utilities\TimeHelper;
 
 class Message
 {
@@ -17,15 +19,20 @@ class Message
         $username = trim($username);
 
         if (empty($text)) {
-            throw new \InvalidArgumentException('message text cannot be empty');
+            throw new \InvalidArgumentException("message text cannot be empty");
         }
         if (empty($username)) {
-            throw new \InvalidArgumentException('message username cannot be empty');
+            throw new \InvalidArgumentException("message username cannot be empty");
         }
 
         $this->text = $text;
         $this->username = $username;
-        $this->setDate(new DateTime());
+
+        try {
+            $this->setDate(TimeHelper::now());
+        } catch (Exception $e) {
+            throw new \RuntimeException("cannot set message time");
+        }
     }
 
     public function getId(): int
@@ -64,7 +71,7 @@ class Message
             "id" => $this->getId(),
             "text" => $this->getText(),
             "username" => $this->getUsername(),
-            "date" => $this->getDate()->format('Y-m-d H:i:s')
+            "date" => TimeHelper::format($this->getDate())
         ];
     }
 }

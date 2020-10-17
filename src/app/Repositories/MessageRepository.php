@@ -3,7 +3,9 @@
 namespace App\Repositories;
 
 use PDO;
+use Exception;
 use App\Models\Message;
+use App\Utilities\TimeHelper;
 use App\Utilities\DatabaseConnectionPool;
 
 class MessageRepository
@@ -19,6 +21,7 @@ class MessageRepository
      * Retrieves collection of all existed messages.
      *
      * @return Message[]
+     * @throws Exception
      */
     public function all(): array
     {
@@ -34,7 +37,7 @@ class MessageRepository
         $collection = [];
         foreach ($result as $item) {
             $message = new Message($item["username"], $item["text"]);
-            $message->setDate(\DateTime::createFromFormat('Y-m-d H:i:s', $item['date']));
+            $message->setDate(\DateTime::createFromFormat(TimeHelper::FORMAT, $item['date']));
             $message->setId($item["id"]);
 
             $collection[] = $message;
@@ -59,7 +62,7 @@ class MessageRepository
         $stmt->execute([
             "text" => $message->getText(),
             "username" => $message->getUsername(),
-            "date" => $message->getDate()->format('Y-m-d H:i:s'),
+            "date" => TimeHelper::format($message->getDate()),
         ]);
 
         $message->setId($connection->lastInsertId());

@@ -60,7 +60,7 @@ class ConnectionOpenHandler
             $usersResponse = new UsersResponse($users);
 
             foreach ($users as $user) {
-                // push online users to all active connections
+                // push updated online users to all active connections
                 go(function () use ($server, $user, $usersResponse) {
                     $server->push($user->getConnectionId(), $usersResponse->getJson());
                 });

@@ -58,8 +58,7 @@ class Application
             $this->userRepository
         ));
 
-        $this->server->on('workerStart', new WorkerStartHandler());
-
         $this->server->on('workerStop', new WorkerStopHandler());
+        $this->server->on('workerStart', new WorkerStartHandler());
     }
 }

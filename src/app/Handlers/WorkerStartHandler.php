@@ -18,9 +18,8 @@ class WorkerStartHandler
 
         $server->tick(static::PING_DELAY, function () use ($server, $workerId) {
             foreach ($server->connections as $id) {
-                // we ping all connections to keep them active
+                // we ping all connections to keep them alive
                 $server->push($id, 'ping', WEBSOCKET_OPCODE_PING);
-                Logger::log("worker $workerId: pinged connection $id");
             }
         });
     }
