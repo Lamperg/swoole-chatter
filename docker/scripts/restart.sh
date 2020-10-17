@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
+# clear app logs before restarting
+sudo bash ./_logs-clean.sh swoole-chatter-app
+
+# move to docker-root folder
 source ./_config.sh || echo 'cannot include _config'
 cd "${DOCKER_ROOT_DIR}" || exit
 
-docker-compose restart $@
+# restart app service
+docker-compose restart app
