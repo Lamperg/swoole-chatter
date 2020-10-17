@@ -2,22 +2,29 @@
 
 namespace App\Handlers;
 
+use App\Models\User;
 use App\Models\Message;
-use App\Responses\MessagesResponse;
 use App\Utilities\Logger;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
+use App\Utilities\Authenticator;
 use App\Responses\ErrorResponse;
+use App\Responses\MessagesResponse;
 use App\Repositories\UserRepository;
 use App\Repositories\MessageRepository;
 
 class MessageHandler
 {
+    protected Authenticator $authenticator;
     protected UserRepository $userRepository;
     protected MessageRepository $messageRepository;
 
-    public function __construct(UserRepository $userRepository, MessageRepository $messageRepository)
-    {
+    public function __construct(
+        Authenticator $authenticator,
+        UserRepository $userRepository,
+        MessageRepository $messageRepository
+    ) {
+        $this->authenticator = $authenticator;
         $this->userRepository = $userRepository;
         $this->messageRepository = $messageRepository;
     }
@@ -25,15 +32,18 @@ class MessageHandler
     public function __invoke(Server $server, Frame $frame): void
     {
         $connectionId = $frame->fd;
-        Logger::log("message has been received: {$frame->data} (connection: $connectionId)");
-
-        // frame data comes in as a string
         $data = json_decode($frame->data, true);
 
         $message = $data['message'] ?? "";
         $username = $data['username'] ?? "";
 
         try {
+            $user = new User($username, $connectionId);
+
+            if (!$this->authenticator->isLoggedIn($user)) {
+                throw new \Exception("user '$username' is not logged in");
+            }
+
             $messageModel = new Message($username, $message);
 
             $this->messageRepository->add($messageModel);
@@ -45,6 +55,8 @@ class MessageHandler
                     $server->push($user->getConnectionId(), $messagesResponse->getJson());
                 });
             }
+
+            Logger::log("message has been received: {$frame->data} (connection: $connectionId)");
         } catch (\Exception $e) {
             Logger::logError($e->getMessage());
 

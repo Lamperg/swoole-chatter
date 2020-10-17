@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Utilities\Authenticator;
 use Swoole\WebSocket\Server;
 use App\Handlers\MessageHandler;
 use App\Handlers\WorkerStopHandler;
@@ -14,6 +15,7 @@ use App\Handlers\ConnectionCloseHandler;
 class Application
 {
     protected Server $server;
+    protected Authenticator $authenticator;
     protected UserRepository $userRepository;
     protected MessageRepository $messageRepository;
 
@@ -21,6 +23,7 @@ class Application
     {
         $this->userRepository = new UserRepository();
         $this->messageRepository = new MessageRepository();
+        $this->authenticator = new Authenticator($this->userRepository);
         $this->server = new Server("app", getenv('APP_SERVER_PORT'));
 
         $this->setHandlers();
@@ -45,11 +48,13 @@ class Application
     protected function setHandlers()
     {
         $this->server->on('message', new MessageHandler(
+            $this->authenticator,
             $this->userRepository,
             $this->messageRepository
         ));
 
         $this->server->on('open', new ConnectionOpenHandler(
+            $this->authenticator,
             $this->userRepository,
             $this->messageRepository
         ));

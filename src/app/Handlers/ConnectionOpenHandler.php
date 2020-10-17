@@ -3,23 +3,29 @@
 namespace App\Handlers;
 
 use App\Models\User;
-use App\Responses\ErrorResponse;
-use App\Responses\UsersResponse;
 use Swoole\Http\Request;
 use App\Utilities\Logger;
 use Swoole\WebSocket\Server;
 use Swoole\Coroutine\WaitGroup;
+use App\Responses\ErrorResponse;
+use App\Responses\UsersResponse;
+use App\Utilities\Authenticator;
 use App\Responses\MessagesResponse;
 use App\Repositories\UserRepository;
 use App\Repositories\MessageRepository;
 
 class ConnectionOpenHandler
 {
+    protected Authenticator $authenticator;
     protected UserRepository $userRepository;
     protected MessageRepository $messageRepository;
 
-    public function __construct(UserRepository $userRepository, MessageRepository $messageRepository)
-    {
+    public function __construct(
+        Authenticator $authenticator,
+        UserRepository $userRepository,
+        MessageRepository $messageRepository
+    ) {
+        $this->authenticator = $authenticator;
         $this->userRepository = $userRepository;
         $this->messageRepository = $messageRepository;
     }
@@ -29,13 +35,17 @@ class ConnectionOpenHandler
         $connectionId = $request->fd;
         Logger::log("connection {$request->fd} has been opened (workerId: {$server->getWorkerId()})");
 
+        $username = $request->get["username"];
+
         $users = [];
         $messages = [];
 
         try {
-            $user = new User('test_user_tmp', $connectionId);
+            if ($this->authenticator->isUsernameUsed($username)) {
+                throw new \InvalidArgumentException("username '$username' has already been used");
+            }
 
-            $this->userRepository->add($user);
+            $this->authenticator->login(new User($username, $connectionId));
 
             $wg = new WaitGroup();
 

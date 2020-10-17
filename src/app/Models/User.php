@@ -14,6 +14,9 @@ class User
         if (empty($username)) {
             throw new \InvalidArgumentException('username cannot be empty');
         }
+        if (empty($connectionId)) {
+            throw new \InvalidArgumentException('connection id cannot be empty');
+        }
 
         $this->username = $username;
         $this->connectionId = $connectionId;
