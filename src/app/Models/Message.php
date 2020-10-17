@@ -11,17 +11,31 @@ class Message
     protected string $username;
     protected DateTime $date;
 
-    public function __construct(int $id, string $username, string $text, DateTime $date)
+    public function __construct(string $username, string $text)
     {
-        $this->id = $id;
+        $text = trim($text);
+        $username = trim($username);
+
+        if (empty($text)) {
+            throw new \InvalidArgumentException('message text cannot be empty');
+        }
+        if (empty($username)) {
+            throw new \InvalidArgumentException('message username cannot be empty');
+        }
+
         $this->text = $text;
-        $this->date = $date;
         $this->username = $username;
+        $this->setDate(new DateTime());
     }
 
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getText(): string
@@ -37,5 +51,10 @@ class Message
     public function getDate(): DateTime
     {
         return $this->date;
+    }
+
+    public function setDate(DateTime $dateTime): void
+    {
+        $this->date = $dateTime;
     }
 }

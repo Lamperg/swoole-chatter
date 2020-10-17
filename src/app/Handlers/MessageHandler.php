@@ -2,6 +2,7 @@
 
 namespace App\Handlers;
 
+use App\Models\Message;
 use App\Repositories\MessageRepository;
 use App\Repositories\UserRepository;
 use App\Utilities\Logger;
@@ -21,25 +22,34 @@ class MessageHandler
 
     public function __invoke(Server $server, Frame $frame): void
     {
-        Logger::log("message has been received: {$frame->data} (connection: {$frame->fd})");
+        $connectionId = $frame->fd;
+        Logger::log("message has been received: {$frame->data} (connection: $connectionId)");
 
         // frame data comes in as a string
-        $output = json_decode($frame->data, true);
+        $data = json_decode($frame->data, true);
 
-        $message = trim($output['message']);
-        $username = trim($output['username']);
+        $message = $data['message'] ?? "";
+        $username = $data['username'] ?? "";
 
-        $this->messageRepository->add($username, $message);
+        try {
+            $messageModel = new Message($username, $message);
 
-        // now we notify all of the connected clients
-        foreach ($this->userRepository->getAll() as $user) {
-            $message = [
-                "text" => $message,
-                "client" => $frame->fd,
-                "username" => $username
-            ];
+            $this->messageRepository->add($messageModel);
 
-            $server->push($user->getConnectionId(), json_encode($message));
+            // now we notify all of the connected clients
+            foreach ($this->userRepository->getAll() as $user) {
+                $message = [
+                    "text" => $message,
+                    "username" => $username,
+                    "client" => $connectionId,
+                    "id" => $messageModel->getId()
+                ];
+
+                $server->push($user->getConnectionId(), json_encode($message));
+            }
+        } catch (\Exception $e) {
+            Logger::logError($e->getMessage());
+            $server->push($connectionId, $e->getMessage());
         }
     }
 }

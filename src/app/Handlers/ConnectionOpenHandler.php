@@ -54,7 +54,7 @@ class ConnectionOpenHandler
 
         go(function () use ($wg, &$existedMessages) {
             $wg->add();
-            $existedMessages = $this->messageRepository->getAll();
+            $existedMessages = $this->messageRepository->all();
             $wg->done();
         });
 

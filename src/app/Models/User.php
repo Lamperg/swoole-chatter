@@ -9,6 +9,12 @@ class User
 
     public function __construct(string $username, int $connectionId)
     {
+        $username = trim($username);
+
+        if (empty($username)) {
+            throw new \InvalidArgumentException('username cannot be empty');
+        }
+
         $this->username = $username;
         $this->connectionId = $connectionId;
     }
