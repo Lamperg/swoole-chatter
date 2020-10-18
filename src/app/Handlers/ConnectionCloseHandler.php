@@ -2,6 +2,7 @@
 
 namespace App\Handlers;
 
+use App\Responses\UsersResponse;
 use App\Utilities\Logger;
 use Swoole\WebSocket\Server;
 use App\Repositories\UserRepository;
@@ -20,6 +21,16 @@ class ConnectionCloseHandler
         try {
             // remove online user connection
             $this->userRepository->delete($connection);
+
+            $users = $this->userRepository->all();
+            $usersResponse = new UsersResponse($users);
+
+            foreach ($users as $user) {
+                // push updated online users to all active connections
+                go(function () use ($server, $user, $usersResponse) {
+                    $server->push($user->getConnectionId(), $usersResponse->render());
+                });
+            }
         } catch (\Exception $e) {
             Logger::logError($e->getMessage());
         }

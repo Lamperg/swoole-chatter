@@ -3,6 +3,7 @@
 namespace App\Handlers;
 
 use App\Models\User;
+use App\Responses\LoginResponse;
 use Swoole\Http\Request;
 use App\Utilities\Logger;
 use App\Utilities\Purifier;
@@ -49,6 +50,11 @@ class ConnectionOpenHandler
             }
 
             $this->authenticator->login(new User($username, $connectionId));
+
+            go(function () use ($server, $connectionId, $username) {
+                $loginResponse = new LoginResponse("user $username successfully logged in");
+                $server->push($connectionId, $loginResponse->render());
+            });
 
             $wg = new WaitGroup();
 
