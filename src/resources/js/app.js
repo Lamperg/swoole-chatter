@@ -1,13 +1,7 @@
-const socket = new WebSocket('ws://swoole-chatter.loc/api');
+import Vue from "vue";
 
-socket.onopen = function() {
-    console.log('Connection established');
+Vue.component("chatbox", require("./components/Chatbox.vue").default);
+Vue.component("online-users", require("./components/OnlineUsers.vue").default);
+Vue.component("messages-list", require("./components/MessagesList.vue").default);
 
-    socket.send('Hello server!');
-};
-
-socket.onerror = ev => console.log('error happen', ev);
-
-socket.onmessage = function(event) {
-  console.log("message received:", event.data);
-};
+const app = new Vue({ el: "#app" });
