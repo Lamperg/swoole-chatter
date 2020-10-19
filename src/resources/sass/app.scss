@@ -17,25 +17,5 @@ body {
   height: 50px;
   display: flex;
   align-items: center;
-}
-
-.messages {
-  overflow-y: scroll;
-  height: 80vh;
-
-  .message {
-    min-width: 300px;
-  }
-
-  .message__date {
-    font-size: 12px;
-  }
-
-  .message__username {
-    font-weight: bold;
-  }
-}
-
-.users-wrapper {
-  right: 0;
+  justify-content: space-between;
 }

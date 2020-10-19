@@ -5,7 +5,13 @@
             <hr />
             <div class="card-text">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item" v-for="user in users">{{ user.username }}</li>
+                    <li
+                        class="list-group-item"
+                        v-bind:class="[user.username === user ? 'text-primary' : 'text-dark']"
+                        v-for="user in users"
+                    >
+                        {{ user.username }}
+                    </li>
                 </ul>
             </div>
         </div>
@@ -14,6 +20,6 @@
 
 <script>
 export default {
-    props: ["users"]
+    props: ["users", "user"]
 };
 </script>
