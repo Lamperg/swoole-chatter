@@ -4,11 +4,16 @@ namespace App\Responses;
 
 class ErrorResponse extends JsonResponse
 {
-    protected string $message;
+    public const LOGIN_ERROR = "login_error";
+    public const GENERAL_ERROR = "general_error";
 
-    public function __construct(string $message)
+    protected string $message;
+    protected string $errorType;
+
+    public function __construct(string $message, string $errorType = null)
     {
         $this->message = $message;
+        $this->errorType = $errorType ?? static::GENERAL_ERROR;
     }
 
     /**
@@ -24,6 +29,9 @@ class ErrorResponse extends JsonResponse
      */
     protected function getBody()
     {
-        return ['message' => $this->message];
+        return [
+            "message" => $this->message,
+            "error_type" => $this->errorType,
+        ];
     }
 }

@@ -6,9 +6,9 @@ class LoginResponse extends JsonResponse
 {
     protected string $message;
 
-    public function __construct(string $message)
+    public function __construct(string $username)
     {
-        $this->message = $message;
+        $this->message = "user $username successfully logged in";
     }
 
     /**

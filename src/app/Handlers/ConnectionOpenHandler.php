@@ -2,19 +2,21 @@
 
 namespace App\Handlers;
 
+use Exception;
 use App\Models\User;
-use App\Responses\LoginResponse;
 use Swoole\Http\Request;
 use App\Utilities\Logger;
 use App\Utilities\Purifier;
 use Swoole\WebSocket\Server;
 use Swoole\Coroutine\WaitGroup;
+use App\Responses\LoginResponse;
 use App\Responses\ErrorResponse;
 use App\Responses\UsersResponse;
 use App\Utilities\Authenticator;
 use App\Responses\MessagesResponse;
 use App\Repositories\UserRepository;
 use App\Repositories\MessageRepository;
+use App\Exceptions\InvalidUsernameException;
 
 class ConnectionOpenHandler
 {
@@ -46,13 +48,12 @@ class ConnectionOpenHandler
             $username = $this->purifier->purify($username);
 
             if ($this->authenticator->isUsernameUsed($username)) {
-                throw new \InvalidArgumentException("username '$username' has already been used");
+                throw new InvalidUsernameException($username);
             }
-
             $this->authenticator->login(new User($username, $connectionId));
 
             go(function () use ($server, $connectionId, $username) {
-                $loginResponse = new LoginResponse("user $username successfully logged in");
+                $loginResponse = new LoginResponse($username);
                 $server->push($connectionId, $loginResponse->render());
             });
 
@@ -72,9 +73,11 @@ class ConnectionOpenHandler
 
             $wg->wait();
 
-            $messagesResponse = new MessagesResponse($messages);
-            // push existed messages to opened connection
-            $server->push($connectionId, $messagesResponse->render());
+            go(function () use ($messages, $server, $connectionId) {
+                $messagesResponse = new MessagesResponse($messages);
+                // push existed messages to opened connection
+                $server->push($connectionId, $messagesResponse->render());
+            });
 
             $usersResponse = new UsersResponse($users);
 
@@ -84,10 +87,14 @@ class ConnectionOpenHandler
                     $server->push($user->getConnectionId(), $usersResponse->render());
                 });
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Logger::logError($e->getMessage());
 
-            $errorResponse = new ErrorResponse($e->getMessage());
+            $errorType = $e instanceof InvalidUsernameException
+                ? ErrorResponse::LOGIN_ERROR
+                : ErrorResponse::GENERAL_ERROR;
+
+            $errorResponse = new ErrorResponse($e->getMessage(), $errorType);
             $server->push($connectionId, $errorResponse->render());
         }
     }
