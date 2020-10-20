@@ -46,7 +46,7 @@ jobs:
         if: success()
         run: |
           docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d --build
-          docker-compose exec -T app bash -c "cd /var/www/swoole-chatter && ls -lah"
+          docker-compose exec -T webserver bash -c "cd /var/www/swoole-chatter && ls -lah"
           docker-compose logs
 
       - name: Validate composer config
