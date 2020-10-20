@@ -11,12 +11,14 @@ services:
   # NGINX Server
   #=============================================================================
   webserver:
+    restart: always
     ports:
       - "80:80"
 
   # DATABASE
   #=============================================================================
   db:
+    restart: always
     tty: true
     ports:
       - "${DB_PORT}:${DB_PORT}"
