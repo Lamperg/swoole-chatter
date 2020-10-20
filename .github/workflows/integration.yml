@@ -40,12 +40,12 @@ jobs:
 
       - name: Validate docker config
         run: |
-          docker-compose -f docker-compose.yml -f docker-compose.prod.yml config
+          docker-compose -f docker-compose.yml -f docker-compose.test.yml config
 
       - name: Build docker
         if: success()
         run: |
-          docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+          docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d
 
       - name: Validate composer config
         if: success()

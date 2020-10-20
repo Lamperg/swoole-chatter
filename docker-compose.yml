@@ -12,8 +12,6 @@ services:
         - APP_SYS_USER_ID=${SYS_USER_ID}
         - APP_SYS_GROUP_ID=${SYS_GROUP_ID}
         - APP_NODE_JS_VERSION=${NODE_JS_VERSION}
-    env_file:
-      - ./.env
     container_name: swoole-chatter-app
     networks:
       - app-network
