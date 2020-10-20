@@ -54,7 +54,7 @@ class ConnectionOpenHandler
 
             go(function () use ($server, $connectionId, $username) {
                 $loginResponse = new LoginResponse($username);
-                $server->push($connectionId, $loginResponse->render());
+                $server->push((string)$connectionId, $loginResponse->render());
             });
 
             $wg = new WaitGroup();
@@ -76,7 +76,7 @@ class ConnectionOpenHandler
             go(function () use ($messages, $server, $connectionId) {
                 $messagesResponse = new MessagesResponse($messages);
                 // push existed messages to opened connection
-                $server->push($connectionId, $messagesResponse->render());
+                $server->push((string)$connectionId, $messagesResponse->render());
             });
 
             $usersResponse = new UsersResponse($users);
@@ -84,7 +84,7 @@ class ConnectionOpenHandler
             foreach ($users as $user) {
                 // push updated online users to all active connections
                 go(function () use ($server, $user, $usersResponse) {
-                    $server->push($user->getConnectionId(), $usersResponse->render());
+                    $server->push((string)$user->getConnectionId(), $usersResponse->render());
                 });
             }
         } catch (Exception $e) {
@@ -95,7 +95,7 @@ class ConnectionOpenHandler
                 : ErrorResponse::GENERAL_ERROR;
 
             $errorResponse = new ErrorResponse($e->getMessage(), $errorType);
-            $server->push($connectionId, $errorResponse->render());
+            $server->push((string)$connectionId, $errorResponse->render());
         }
     }
 }

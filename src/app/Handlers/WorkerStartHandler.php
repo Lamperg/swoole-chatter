@@ -19,7 +19,7 @@ class WorkerStartHandler
         $server->tick(static::PING_DELAY, function () use ($server, $workerId) {
             foreach ($server->connections as $id) {
                 // we ping all connections to keep them alive
-                $server->push($id, 'ping', WEBSOCKET_OPCODE_PING);
+                $server->push((string)$id, 'ping', (string)WEBSOCKET_OPCODE_PING);
             }
         });
     }

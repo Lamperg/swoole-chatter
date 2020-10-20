@@ -58,7 +58,7 @@ class MessageHandler
             foreach ($this->userRepository->all() as $user) {
                 // push new message to all active clients
                 go(function () use ($server, $user, $messagesResponse) {
-                    $server->push($user->getConnectionId(), $messagesResponse->render());
+                    $server->push((string)$user->getConnectionId(), $messagesResponse->render());
                 });
             }
         } catch (\Exception $e) {

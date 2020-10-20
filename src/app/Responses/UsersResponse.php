@@ -22,7 +22,7 @@ class UsersResponse extends JsonResponse
      */
     protected function getBody()
     {
-        return $this->users ?? [];
+        return $this->users ?: [];
     }
 
     /**

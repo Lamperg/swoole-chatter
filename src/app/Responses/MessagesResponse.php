@@ -22,7 +22,7 @@ class MessagesResponse extends JsonResponse
      */
     protected function getBody()
     {
-        return $this->messages ?? [];
+        return $this->messages ?: [];
     }
 
     /**

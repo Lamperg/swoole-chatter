@@ -17,7 +17,7 @@ class UserRepository
     public function __construct()
     {
         $this->users = new Table(1024 * 24);
-        $this->users->column('username', Table::TYPE_STRING, 64);
+        $this->users->column('username', (string)Table::TYPE_STRING, 64);
         $this->users->create();
     }
 
@@ -30,8 +30,14 @@ class UserRepository
 
     public function getById(int $id)
     {
-        $userRow = $this->users->get($id);
-        if ($userRow !== false) {
+        /**
+         * @psalm-suppress TooFewArguments
+         */
+        $userRow = $this->users->get((string)$id);
+        if (!empty($userRow)) {
+            /**
+             * @psalm-suppress InvalidArrayAccess
+             */
             return new User($userRow['username'], $id);
         }
         return false;
@@ -45,7 +51,7 @@ class UserRepository
         $collection = [];
 
         foreach ($this->users as $connection => $user) {
-            $collection[$connection] = new User($user['username'], $connection);
+            $collection[$connection] = new User($user['username'], (int)$connection);
         }
 
         return $collection;
@@ -53,13 +59,13 @@ class UserRepository
 
     public function add(User $user)
     {
-        $this->users->set($user->getConnectionId(), [
+        $this->users->set((string)$user->getConnectionId(), [
             'username' => $user->getUsername()
         ]);
     }
 
     public function delete(int $connectionId)
     {
-        $this->users->del($connectionId);
+        $this->users->del((string)$connectionId);
     }
 }

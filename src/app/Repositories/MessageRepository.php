@@ -65,7 +65,7 @@ class MessageRepository
             "date" => TimeHelper::format($message->getDate()),
         ]);
 
-        $message->setId($connection->lastInsertId());
+        $message->setId((int)$connection->lastInsertId());
 
         // move the connection back to pool
         $this->dbPool->putConnection($connection);

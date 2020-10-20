@@ -33,6 +33,7 @@
         <UndefinedClass>
             <errorLevel type="suppress">
                 <directory name="tests"/>
+                <directory name="app"/>
             </errorLevel>
         </UndefinedClass>
         <PossiblyUndefinedMethod>

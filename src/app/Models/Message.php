@@ -8,7 +8,7 @@ use App\Utilities\TimeHelper;
 
 class Message
 {
-    protected int $id;
+    protected ?int $id;
     protected string $text;
     protected string $username;
     protected DateTime $date;
@@ -25,6 +25,7 @@ class Message
             throw new \InvalidArgumentException("message username cannot be empty");
         }
 
+        $this->id = null;
         $this->text = $text;
         $this->username = $username;
 
