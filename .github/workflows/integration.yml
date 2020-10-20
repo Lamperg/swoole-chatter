@@ -3,6 +3,9 @@ name: Integration
 # Trigger events
 #=============================================================================
 on:
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
@@ -14,13 +17,18 @@ jobs:
     # Environment variables
     #==========================================================================
     env:
-      DB_NAME: test
-      DB_USER: test
-      DB_PASSWORD: test
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-      PHP_VERSION: 7.4
       SYS_USER_ID: ${{ secrets.SYS_USER_ID }}
       SYS_GROUP_ID: ${{ secrets.SYS_GROUP_ID }}
+
+      PHP_VERSION: 7.4
+      NODE_JS_VERSION: 14
+      APP_SERVER_PORT: ${{ secrets.APP_SERVER_PORT }}
 
     # Steps of the pipeline
     #==========================================================================
