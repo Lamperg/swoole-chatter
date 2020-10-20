@@ -50,6 +50,8 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
+      - ./docker/db/install.sh:/install.sh
+      - ./docker/db/setup.sql:/setup.sql
       - db-data:/var/lib/mysql
     networks:
       - app-network

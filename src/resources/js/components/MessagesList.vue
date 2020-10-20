@@ -13,7 +13,7 @@
                 <div class="mb-0 text-secondary text-right message__date">{{ message.date }}</div>
             </div>
 
-            <div v-else class="h-100 text-secondary d-flex align-items-center justify-content-center">
+            <div v-if="!messages.length" class="h-100 text-secondary d-flex align-items-center justify-content-center">
                 There are no any messages yet
             </div>
         </div>
