@@ -21,17 +21,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql
+#RUN docker-php-ext-install pdo_mysql
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Install Swoole
-RUN pecl install swoole
+#RUN pecl install swoole
 
 # Install nodejs/npm
-RUN curl -sL https://deb.nodesource.com/setup_${APP_NODE_JS_VERSION}.x | bash -
-RUN apt-get -y install nodejs
+#RUN curl -sL https://deb.nodesource.com/setup_${APP_NODE_JS_VERSION}.x | bash -
+#RUN apt-get -y install nodejs
 
 # Add user for application
 RUN groupadd -g ${APP_SYS_GROUP_ID} www
