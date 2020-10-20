@@ -27,4 +27,3 @@ jobs:
             cd ${{ secrets.DEPLOYMENT_PROJECT_PATH }}
             git pull origin master
             docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-            docker-compose exec -T --user www app composer install --prefer-dist --no-dev --optimize-autoloader --no-interaction

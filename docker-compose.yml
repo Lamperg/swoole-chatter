@@ -19,8 +19,7 @@ services:
       - ./src:/var/www/swoole-chatter
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     command: >
-      bash -c "composer install --prefer-dist --no-progress --no-suggest\
-      && php index.php"
+      bash -c "composer install --prefer-dist --no-progress --no-suggest && php index.php"
 
   # NGINX Server
   #=============================================================================
