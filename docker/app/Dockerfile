@@ -45,5 +45,3 @@ USER www
 
 # Expose public ports and start swoole server
 EXPOSE 9000
-
-CMD ["php", "index.php"]
