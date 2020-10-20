@@ -19,4 +19,4 @@ services:
   db:
     tty: true
     ports:
-      - "3306:3306"
+      - "${DB_PORT}:${DB_PORT}"
