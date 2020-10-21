@@ -47,11 +47,15 @@ jobs:
         run: |
           docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d --build
           docker-compose exec -T app bash -c "cd /var/www/swoole-chatter && ls -lah"
-          docker-compose logs
+          docker-compose logs app
 
       - name: Validate composer config
         if: success()
         run: docker-compose exec -T --user www app composer validate
+
+      - name: Wait test
+        if: success()
+        run: sleep 10
 
 #      - name: Install dependencies
 #        if: success()
