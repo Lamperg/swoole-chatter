@@ -48,11 +48,16 @@ jobs:
         if: success()
         run: docker-compose exec -T --user www app composer validate
 
-      - name: Check installation
+      - name: Install dependencies
         if: success()
         run: |
-          sleep 15
-          docker-compose logs app
+          docker-compose exec -T --user www app \
+          composer install --prefer-dist --no-suggest
+
+      - name: Start swoole server
+        if: success()
+        run: |
+          docker-compose exec -T --user www app php index.php
 
       - name: Check code quality (Sniffer)
         if: success()
