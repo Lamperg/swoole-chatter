@@ -22,9 +22,24 @@ jobs:
           port: ${{ secrets.DEPLOYMENT_PORT }}
           script: |
             cd ${{ secrets.DEPLOYMENT_PROJECT_PATH }}
+
+            echo "Pull code"
+            echo "============================================================================="
             git pull origin master
+
+            echo "Build container"
+            echo "============================================================================="
             docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+            echo "Install dependencies"
+            echo "============================================================================="
             docker-compose exec --user www app composer install --prefer-dist --no-dev --optimize-autoloader --no-interaction
-            docker-compose exec --user www app php index.php
             docker-compose exec --user www app npm install
+
+            echo "Start swoole server"
+            echo "============================================================================="
+            docker-compose exec --user www app php index.php
+
+            echo "Build frontend"
+            echo "============================================================================="
             docker-compose exec --user www app npm run prod
