@@ -3,10 +3,7 @@ name: Deployment
 # Trigger events
 #=============================================================================
 on:
-#  push:
-#    branches:
-#      - master
-  pull_request:
+  push:
     branches:
       - master
 
@@ -27,3 +24,7 @@ jobs:
             cd ${{ secrets.DEPLOYMENT_PROJECT_PATH }}
             git pull origin master
             docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+            docker-compose exec --user www app composer install --prefer-dist --no-dev --optimize-autoloader --no-interaction
+            docker-compose exec --user www app php index.php
+            docker-compose exec --user www app npm install
+            docker-compose exec --user www app npm run prod

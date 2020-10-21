@@ -2,8 +2,8 @@
 
 namespace App;
 
-use App\Utilities\Authenticator;
 use Swoole\WebSocket\Server;
+use App\Utilities\Authenticator;
 use App\Handlers\MessageHandler;
 use App\Handlers\WorkerStopHandler;
 use App\Handlers\WorkerStartHandler;
@@ -35,7 +35,9 @@ class Application
     public function run()
     {
         $configs = [
-            "worker_num" => swoole_cpu_num() * 2
+            "daemonize" => 1,
+            "worker_num" => swoole_cpu_num() * 2,
+            "log_file" => "/var/www/swoole-chatter/swoole.log",
         ];
 
         $this->server->set($configs);

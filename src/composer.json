@@ -1,7 +1,7 @@
 {
-    "name": "lamperg/github-actions-training",
+    "name": "lamperg/swoole-chatter",
     "license": "MIT",
-    "description": "A test project for github actions",
+    "description": "Swoole based realtime chat",
     "authors": [
         {
             "name": "Serhii Moroz",
