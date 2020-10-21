@@ -9,8 +9,6 @@ services:
     tty: true
     ports:
       - "9000:9000"
-    command: >
-      bash -c "composer install --prefer-dist --no-dev --optimize-autoloader --no-interaction && php index.php"
 
   # NGINX Server
   #=============================================================================
