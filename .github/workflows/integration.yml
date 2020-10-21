@@ -51,7 +51,7 @@ jobs:
       - name: Check installation
         if: success()
         run: |
-          sleep 10
+          sleep 15
           docker-compose logs app
 
       - name: Check code quality (Sniffer)
