@@ -53,15 +53,9 @@ jobs:
         if: success()
         run: docker-compose exec -T --user www app composer validate
 
-      - name: Wait test
+      - name: Check installation
         if: success()
         run: sleep 10
-
-#      - name: Install dependencies
-#        if: success()
-#        run: |
-#          docker-compose exec -T --user www app \
-#          composer install --prefer-dist --no-progress --no-suggest
 
       - name: Check code quality (Sniffer)
         if: success()
@@ -78,4 +72,4 @@ jobs:
       - name: Run PHP tests
         run: |
           docker-compose exec -T --user www app \
-          ./vendor/bin/phpunit --testdox
+          ./vendor/bin/phpunit --filter MessageTest --testdox
