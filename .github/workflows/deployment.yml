@@ -33,13 +33,13 @@ jobs:
 
             echo "Install dependencies"
             echo "============================================================================="
-            docker-compose exec --user www app composer install --prefer-dist --no-dev --optimize-autoloader --no-interaction
-            docker-compose exec --user www app npm install
+            docker-compose exec -T --user www app composer install --prefer-dist --no-dev --optimize-autoloader --no-interaction
+            docker-compose exec -T --user www app npm install
 
             echo "Start swoole server"
             echo "============================================================================="
-            docker-compose exec --user www app php index.php
+            docker-compose exec -T --user www app php index.php
 
             echo "Build frontend"
             echo "============================================================================="
-            docker-compose exec --user www app npm run prod
+            docker-compose exec -T --user www app npm run prod
