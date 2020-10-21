@@ -9,3 +9,6 @@ cd "${DOCKER_ROOT_DIR}" || exit
 
 # restart app service
 docker-compose restart app
+
+debug "Start swoole server"
+docker-compose exec --user www app php index.php
