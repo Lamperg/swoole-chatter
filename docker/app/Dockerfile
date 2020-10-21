@@ -43,6 +43,5 @@ RUN chown -R www:www /var/www/swoole-chatter
 # Change current user to www
 USER www
 
-# Expose public ports and start swoole server
-EXPOSE 9000
-CMD ["php-fpm"]
+# Stub to start container
+CMD ["bash"]
