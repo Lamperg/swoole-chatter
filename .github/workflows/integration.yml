@@ -3,9 +3,6 @@ name: Integration
 # Trigger events
 #=============================================================================
 on:
-  push:
-    branches:
-      - dev
   pull_request:
     branches:
       - master
@@ -46,8 +43,6 @@ jobs:
         if: success()
         run: |
           docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d --build
-          docker-compose exec -T app bash -c "cd /var/www/swoole-chatter && ls -lah"
-          docker-compose logs app
 
       - name: Validate composer config
         if: success()
@@ -55,7 +50,9 @@ jobs:
 
       - name: Check installation
         if: success()
-        run: sleep 10
+        run: |
+          sleep 10
+          docker-compose logs app
 
       - name: Check code quality (Sniffer)
         if: success()
