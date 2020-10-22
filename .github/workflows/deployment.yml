@@ -43,3 +43,8 @@ jobs:
             echo "Build frontend"
             echo "============================================================================="
             docker-compose exec -T --user www app npm run prod
+
+            echo "Run DB migration"
+            echo "============================================================================="
+            sleep 5
+            docker-compose exec db bash install.sh

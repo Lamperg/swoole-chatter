@@ -30,7 +30,7 @@ class MessageRepository
         // get available db connection
         $connection = $this->dbPool->getConnection();
 
-        $stmt = $connection->query('select * from messages');
+        $stmt = $connection->query('select * from messages order by date');
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // move the connection back to pool
