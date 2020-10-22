@@ -47,4 +47,4 @@ jobs:
             echo "Run DB migration"
             echo "============================================================================="
             sleep 5
-            docker-compose exec db bash install.sh
+            docker-compose exec -T db bash install.sh
