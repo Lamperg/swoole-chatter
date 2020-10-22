@@ -2,7 +2,9 @@
 
 namespace App\Repositories;
 
+use DateTimeZone;
 use PDO;
+use DateTime;
 use Exception;
 use App\Models\Message;
 use App\Utilities\TimeHelper;
@@ -37,8 +39,12 @@ class MessageRepository
         $collection = [];
         foreach ($result as $item) {
             $message = new Message($item["username"], $item["text"]);
-            $message->setDate(\DateTime::createFromFormat(TimeHelper::FORMAT, $item['date']));
             $message->setId($item["id"]);
+            $message->setDate(DateTime::createFromFormat(
+                TimeHelper::FORMAT,
+                $item['date'],
+                new DateTimeZone(TimeHelper::TIMEZONE)
+            ));
 
             $collection[] = $message;
         }
