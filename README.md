@@ -2,7 +2,7 @@
 
 > Swoole based realtime chat.
 
-[![Actions Status](https://github.com/Lamperg/swoole-chatter/workflows/Integration/badge.svg)](https://github.com/Lamperg/swoole-chatter/actions) 
+[![Actions Status](https://github.com/Lamperg/swoole-chatter/workflows/Integration/badge.svg?branch=dev)](https://github.com/Lamperg/swoole-chatter/actions) 
 [![CodeFactor](https://www.codefactor.io/repository/github/lamperg/swoole-chatter/badge)](https://www.codefactor.io/repository/github/lamperg/swoole-chatter)
 
 ## Requirements
