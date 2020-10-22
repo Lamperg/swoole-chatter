@@ -26,7 +26,6 @@ docker-compose exec --user www app php index.php
 debug "Build frontend"
 docker-compose exec --user www app npm run dev
 
-
 # Run DB migration
 #=============================================================================
 debug "Run DB migrations"

@@ -1,7 +1,11 @@
-CREATE TABLE IF NOT EXISTS messages(
+CREATE TABLE IF NOT EXISTS messages
+(
     id       INT          NOT NULL AUTO_INCREMENT,
     username VARCHAR(30)  NOT NULL,
     text     VARCHAR(255) NOT NULL,
     date     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (ID)
 );
+
+ALTER TABLE messages
+    CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
