@@ -4,6 +4,7 @@ namespace App;
 
 use Swoole\WebSocket\Server;
 use App\Utilities\Authenticator;
+use App\Handlers\RequestHandler;
 use App\Handlers\MessageHandler;
 use App\Handlers\WorkerStopHandler;
 use App\Handlers\WorkerStartHandler;
@@ -49,6 +50,10 @@ class Application
      */
     protected function setHandlers()
     {
+        $this->server->on('request', new RequestHandler(
+            $this->messageRepository
+        ));
+
         $this->server->on('message', new MessageHandler(
             $this->authenticator,
             $this->userRepository,
