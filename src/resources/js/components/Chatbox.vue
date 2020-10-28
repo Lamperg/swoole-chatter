@@ -75,7 +75,7 @@ export default {
 
             this.websocket.onmessage = (event) => this.parseResponse(JSON.parse(event.data));
             this.websocket.onerror = (error) => this.flash(error.message, "danger");
-            this.websocket.onopen = (event) => console.log("Connection has been opened");
+            this.websocket.onopen = (event) => console.log("Connection has been opened!");
         },
 
         authenticate() {
